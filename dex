@@ -1635,7 +1635,7 @@ local function main()
 		if itemChangedCon then itemChangedCon:Disconnect() end
 
 		if Main.Elevated then
-			descendantAddedCon = game.DescendantAdded:Connect(addObject)
+			-- descendantAddedCon = game.DescendantAdded:Connect(addObject) -- Disabled for stability
 			descendantRemovingCon = game.DescendantRemoving:Connect(removeObject)
 		else
 			descendantAddedCon = game.DescendantAdded:Connect(function(obj) pcall(addObject,obj) end)
@@ -3273,8 +3273,8 @@ return search]==]
 		end
 		table.clear(attachCons)
 
-		local partEnabled = false -- Settings.Explorer.PartSelectionBox
-		local guiEnabled = false -- Settings.Explorer.GuiSelectionBox
+		local partEnabled = false
+		local guiEnabled = false
 		if not partEnabled and not guiEnabled then return end
 
 		local svg = Explorer.SelectionVisualGui
@@ -13907,23 +13907,22 @@ Main = (function()
 	end
 	
 	Main.SecureGui = function(gui)
-		-- Randomize the name of the GUI and every single child within it
-		local function randomize(obj)
-			obj.Name = Main.GetRandomString()
-			for _, child in ipairs(obj:GetChildren()) do
-				randomize(child)
-			end
+		gui.Name = Main.GetRandomString()
+		if gui:IsA("ScreenGui") then
+			gui.ResetOnSpawn = false
 		end
-		randomize(gui)
-
+		
+		-- Priority list for safe GUI hiding
 		if gethui then
 			gui.Parent = gethui()
 		elseif syn and syn.protect_gui then
 			syn.protect_gui(gui)
-			gui.Parent = service.CoreGui
+			gui.Parent = game:GetService("CoreGui")
+		elseif game:GetService("RunService"):IsStudio() then
+			gui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 		else
-			-- Fallback for lower-tier executors
-			gui.Parent = service.CoreGui
+			-- Last resort: CoreGui (Risky but necessary if gethui is missing)
+			gui.Parent = game:GetService("CoreGui")
 		end
 	end
 
