@@ -1,3 +1,10 @@
+if not game:IsLoaded() then
+	game.Loaded:Wait()
+end
+-- Wait for network idle to prevent streaming errors
+local RunService = game:GetService("RunService")
+RunService.RenderStepped:Wait()
+task.wait(2)
 --[[
 	Dex++
 	Version 2.2
@@ -763,7 +770,8 @@ local function main()
 
 		local focussedOutput
 
-		LogService.MessageOut:Connect(function(msg, msgtype)
+		-- LogService.MessageOut:Connect(function(msg, msgtype)
+		--[[
 			local formattedText = ""
 			local unformattedText = ""
 			local newOutputText = Console.OutputTemplate:Clone()
@@ -812,6 +820,7 @@ local function main()
 				Console.Output.CanvasPosition = Vector2.new(0, 9e9)
 			end
 		end)
+		--]]
 
 		Console.Output.MouseLeave:Connect(function()
 			if focussedOutput then
@@ -3264,8 +3273,8 @@ return search]==]
 		end
 		table.clear(attachCons)
 
-		local partEnabled = Settings.Explorer.PartSelectionBox
-		local guiEnabled = Settings.Explorer.GuiSelectionBox
+		local partEnabled = false -- Settings.Explorer.PartSelectionBox
+		local guiEnabled = false -- Settings.Explorer.GuiSelectionBox
 		if not partEnabled and not guiEnabled then return end
 
 		local svg = Explorer.SelectionVisualGui
